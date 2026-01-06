@@ -61,6 +61,11 @@ th {
 
 <h2>Cadastro</h2>
 
+<button onclick="exportarJSON()">Salvar JSON</button>
+<button onclick="importarJSON()">Carregar JSON</button>
+<input type="file" id="arquivoJSON" accept=".json" hidden>
+
+
 <form id="form">
     <input type="hidden" id="id">
 
@@ -95,6 +100,8 @@ th {
             <th>Hora</th>
             <th>Nome</th>
             <th>CPF</th>
+            <th>Relato do cliente</th>
+            <th>Procedimento realizado</th>
             <th>Ações</th>
         </tr>
     </thead>
@@ -102,11 +109,34 @@ th {
 </table>
 
 <script>
-let registros = JSON.parse(localStorage.getItem("registros")) || [];
 
-function salvarLocal() {
-    localStorage.setItem("registros", JSON.stringify(registros));
+// let registros = JSON.parse(localStorage.getItem("registros")) || [];
+
+// function salvarLocal() {
+//     localStorage.setItem("registros", JSON.stringify(registros));
+// }
+
+let registros = [];
+let sessaoAtiva = false;
+
+function salvarCache() {
+    if (sessaoAtiva) {
+        localStorage.setItem("registros_cache", JSON.stringify(registros));
+    }
 }
+
+function limparCache() {
+    localStorage.removeItem("registros_cache");
+    sessaoAtiva = false;
+}
+
+const cache = localStorage.getItem("registros_cache");
+if (cache) {
+    registros = JSON.parse(cache);
+    sessaoAtiva = true;
+}
+
+renderizar();
 
 function renderizar() {
     const tabela = document.getElementById("tabela");
@@ -119,6 +149,8 @@ function renderizar() {
                 <td>${r.hora}</td>
                 <td>${r.nome}</td>
                 <td>${r.cpf}</td>
+                <td>${r.relato}</td>
+                <td>${r.procedimento}</td>
                 <td class="actions">
                     <button onclick="editar(${i})">Editar</button>
                     <button onclick="excluir(${i})">Excluir</button>
@@ -137,7 +169,9 @@ document.getElementById("form").addEventListener("submit", function(e) {
         data: data.value,
         hora: hora.value,
         nome: nome.value,
-        cpf: cpf.value
+        cpf: cpf.value,
+        relato: relato.value,
+        procedimento: procedimento.value
     };
 
     if (id === "") {
@@ -146,7 +180,7 @@ document.getElementById("form").addEventListener("submit", function(e) {
         registros[id] = registro;
     }
 
-    salvarLocal();
+    salvarCache();
     renderizar();
     limpar();
 });
@@ -157,12 +191,14 @@ function editar(i) {
     hora.value = registros[i].hora;
     nome.value = registros[i].nome;
     cpf.value = registros[i].cpf;
+    relato.value = registros[i].relato;
+    procedimento.value = registros[i].procedimento;
 }
 
 function excluir(i) {
     if (confirm("Deseja excluir este registro?")) {
         registros.splice(i, 1);
-        salvarLocal();
+        salvarCache();
         renderizar();
     }
 }
@@ -174,6 +210,15 @@ function limpar() {
 
 renderizar();
 
+const labels = {
+    data: "Data",
+    hora: "Hora",
+    nome: "Nome",
+    cpf: "CPF",
+    relato: "Relato do cliente",
+    procedimento: "Procedimento realizado"
+};
+
 function exportarTXT(i) {
     const registro = registros[i];
     let texto = "";
@@ -182,7 +227,7 @@ function exportarTXT(i) {
         const valor = registro[campo];
 
         if (valor && valor.toString().trim() !== "") {
-            texto += `${capitalizar(campo)}: ${valor}\n`;
+            texto += `${labels[campo] || capitalizar(campo)}: ${valor}\n`;
         }
     }
 
@@ -202,6 +247,71 @@ function abrirTXT(conteudo) {
 
 function capitalizar(texto) {
     return texto.charAt(0).toUpperCase() + texto.slice(1);
+}
+
+function exportarJSON() {
+    const timestamp = gerarTimestamp();
+    const nomeArquivo = `RegistroProtocoloSAC-${timestamp}.json`;
+
+    const blob = new Blob(
+        [JSON.stringify(registros, null, 2)],
+        { type: "application/json" }
+    );
+
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = nomeArquivo;
+    a.click();
+
+    URL.revokeObjectURL(a.href);
+
+    limparCache();
+}
+
+
+function importarJSON() {
+    document.getElementById("arquivoJSON").click();
+}
+
+document.getElementById("arquivoJSON").addEventListener("change", function(e) {
+    const arquivo = e.target.files[0];
+    if (!arquivo) return;
+
+    const reader = new FileReader();
+
+    reader.onload = function(evt) {
+        try {
+            const dados = JSON.parse(evt.target.result);
+
+            if (!Array.isArray(dados)) {
+                alert("Arquivo JSON inválido.");
+                return;
+            }
+
+            registros = dados;
+            sessaoAtiva = true;
+            salvarCache();
+            renderizar();
+            limpar();
+        } catch {
+            alert("Erro ao ler o arquivo JSON.");
+        }
+    };
+
+    reader.readAsText(arquivo);
+});
+
+function gerarTimestamp() {
+    const agora = new Date();
+
+    const ano = agora.getFullYear();
+    const mes = String(agora.getMonth() + 1).padStart(2, "0");
+    const dia = String(agora.getDate()).padStart(2, "0");
+    const hora = String(agora.getHours()).padStart(2, "0");
+    const min = String(agora.getMinutes()).padStart(2, "0");
+    const seg = String(agora.getSeconds()).padStart(2, "0");
+
+    return `${dia}${mes}${ano}-${hora}${min}${seg}`;
 }
 
 </script>
