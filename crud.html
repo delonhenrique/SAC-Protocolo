@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>CRUD Simples</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f6f8;
+    padding: 20px;
+}
+
+h2 {
+    margin-bottom: 10px;
+}
+
+form {
+    background: #fff;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    max-width: 500px;
+}
+
+input {
+    width: 100%;
+    padding: 8px;
+    margin: 5px 0 10px 0;
+}
+
+button {
+    padding: 8px 12px;
+    margin-right: 5px;
+    cursor: pointer;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    background: #fff;
+}
+
+th, td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: center;
+}
+
+th {
+    background: #eee;
+}
+
+.actions button {
+    margin: 0 3px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Cadastro</h2>
+
+<form id="form">
+    <input type="hidden" id="id">
+
+    <label>Data</label>
+    <input type="date" id="data" >
+
+    <label>Hora</label>
+    <input type="time" id="hora" >
+
+    <label>Nome</label>
+    <input type="text" id="nome" >
+
+    <label>CPF</label>
+    <input type="text" id="cpf" >
+
+    <button type="submit">Salvar</button>
+    <button type="button" onclick="limpar()">Cancelar</button>
+</form>
+
+<h2>Registros</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Data</th>
+            <th>Hora</th>
+            <th>Nome</th>
+            <th>CPF</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody id="tabela"></tbody>
+</table>
+
+<script>
+let registros = JSON.parse(localStorage.getItem("registros")) || [];
+
+function salvarLocal() {
+    localStorage.setItem("registros", JSON.stringify(registros));
+}
+
+function renderizar() {
+    const tabela = document.getElementById("tabela");
+    tabela.innerHTML = "";
+
+    registros.forEach((r, i) => {
+        tabela.innerHTML += `
+            <tr>
+                <td>${r.data}</td>
+                <td>${r.hora}</td>
+                <td>${r.nome}</td>
+                <td>${r.cpf}</td>
+                <td class="actions">
+                    <button onclick="editar(${i})">Editar</button>
+                    <button onclick="excluir(${i})">Excluir</button>
+                    <button onclick="exportarTXT(${i})">Gerar Protocolo</button>
+                </td>
+            </tr>
+        `;
+    });
+}
+
+document.getElementById("form").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const id = document.getElementById("id").value;
+    const registro = {
+        data: data.value,
+        hora: hora.value,
+        nome: nome.value,
+        cpf: cpf.value
+    };
+
+    if (id === "") {
+        registros.push(registro);
+    } else {
+        registros[id] = registro;
+    }
+
+    salvarLocal();
+    renderizar();
+    limpar();
+});
+
+function editar(i) {
+    document.getElementById("id").value = i;
+    data.value = registros[i].data;
+    hora.value = registros[i].hora;
+    nome.value = registros[i].nome;
+    cpf.value = registros[i].cpf;
+}
+
+function excluir(i) {
+    if (confirm("Deseja excluir este registro?")) {
+        registros.splice(i, 1);
+        salvarLocal();
+        renderizar();
+    }
+}
+
+function limpar() {
+    document.getElementById("id").value = "";
+    document.getElementById("form").reset();
+}
+
+renderizar();
+
+function exportarTXT(i) {
+    const registro = registros[i];
+    let texto = "";
+
+    for (const campo in registro) {
+        const valor = registro[campo];
+
+        if (valor && valor.toString().trim() !== "") {
+            texto += `${capitalizar(campo)}: ${valor}\n`;
+        }
+    }
+
+    if (texto === "") {
+        alert("Nenhum campo preenchido para exportar.");
+        return;
+    }
+
+    abrirTXT(texto);
+}
+
+function abrirTXT(conteudo) {
+    const novaJanela = window.open("", "_blank");
+    novaJanela.document.write("<pre>" + conteudo + "</pre>");
+    novaJanela.document.close();
+}
+
+function capitalizar(texto) {
+    return texto.charAt(0).toUpperCase() + texto.slice(1);
+}
+
+</script>
+
+</body>
+</html>
