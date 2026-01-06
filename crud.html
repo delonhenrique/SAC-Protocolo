@@ -1,150 +1,158 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-<meta charset="UTF-8">
-<title>CRUD Simples</title>
+    <meta charset="UTF-8">
+    <title>CRUD Simples</title>
 
-<style>
-body {
-    font-family: Arial, sans-serif;
-    background: #f4f6f8;
-    padding: 20px;
-}
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            padding: 20px;
+        }
 
-h2 {
-    margin-bottom: 10px;
-}
+        h2 {
+            margin-bottom: 10px;
+        }
 
-form {
-    background: #fff;
-    padding: 15px;
-    border-radius: 5px;
-    margin-bottom: 20px;
-    max-width: 500px;
-}
+        form {
+            background: #fff;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            max-width: 500px;
+        }
 
-input {
-    width: 100%;
-    padding: 8px;
-    margin: 5px 0 10px 0;
-}
+        input {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0 10px 0;
+        }
 
-button {
-    padding: 8px 12px;
-    margin-right: 5px;
-    cursor: pointer;
-}
+        button {
+            padding: 8px 12px;
+            margin-right: 5px;
+            cursor: pointer;
+        }
 
-table {
-    border-collapse: collapse;
-    width: 100%;
-    background: #fff;
-}
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            background: #fff;
+        }
 
-th, td {
-    border: 1px solid #ccc;
-    padding: 8px;
-    text-align: center;
-}
+        th,
+        td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+        }
 
-th {
-    background: #eee;
-}
+        th {
+            background: #eee;
+        }
 
-.actions button {
-    margin: 0 3px;
-}
-</style>
+        .actions button {
+            margin: 0 3px;
+        }
+    </style>
 </head>
 
 <body>
 
-<h2>Cadastro</h2>
+    <h2>Cadastro</h2>
 
-<button onclick="exportarJSON()">Salvar JSON</button>
-<button onclick="importarJSON()">Carregar JSON</button>
-<input type="file" id="arquivoJSON" accept=".json" hidden>
+    <button onclick="exportarJSON()">Salvar JSON</button>
+    <button onclick="importarJSON()">Carregar JSON</button>
+    <input type="file" id="arquivoJSON" accept=".json" hidden>
 
 
-<form id="form">
-    <input type="hidden" id="id">
+    <form id="form">
+        <input type="hidden" id="id">
 
-    <label>Data</label>
-    <input type="date" id="data" >
+        <label>Data</label>
+        <input type="date" id="data">
 
-    <label>Hora</label>
-    <input type="time" id="hora" >
+        <label>Hora</label>
+        <input type="time" id="hora">
 
-    <label>Nome</label>
-    <input type="text" id="nome" >
+        <label>Nome</label>
+        <input type="text" id="nome">
 
-    <label>CPF</label>
-    <input type="text" id="cpf" >
-    
-    <label>Relato do cliente:</label>
-    <input type="text" id="relato" >
-    
-    <label>Procedimento realizado:</label>
-    <input type="text" id="procedimento" >
+        <label>CPF</label>
+        <input type="text" id="cpf">
 
-    <button type="submit">Salvar</button>
-    <button type="button" onclick="limpar()">Cancelar</button>
-</form>
+        <label>Relato do cliente:</label>
+        <input type="text" id="relato">
 
-<h2>Registros</h2>
+        <label>Procedimento realizado:</label>
+        <input type="text" id="procedimento">
 
-<table>
-    <thead>
-        <tr>
-            <th>Data</th>
-            <th>Hora</th>
-            <th>Nome</th>
-            <th>CPF</th>
-            <th>Relato do cliente</th>
-            <th>Procedimento realizado</th>
-            <th>Ações</th>
-        </tr>
-    </thead>
-    <tbody id="tabela"></tbody>
-</table>
+        <button type="submit">Salvar</button>
+        <button type="button" onclick="limpar()">Cancelar</button>
+    </form>
 
-<script>
+    <h2>Registros</h2>
 
-// let registros = JSON.parse(localStorage.getItem("registros")) || [];
-
-// function salvarLocal() {
-//     localStorage.setItem("registros", JSON.stringify(registros));
-// }
-
-let registros = [];
-let sessaoAtiva = false;
-
-function salvarCache() {
-    if (sessaoAtiva) {
-        localStorage.setItem("registros_cache", JSON.stringify(registros));
-    }
-}
-
-function limparCache() {
-    localStorage.removeItem("registros_cache");
-    sessaoAtiva = false;
-}
-
-const cache = localStorage.getItem("registros_cache");
-if (cache) {
-    registros = JSON.parse(cache);
-    sessaoAtiva = true;
-}
-
-renderizar();
-
-function renderizar() {
-    const tabela = document.getElementById("tabela");
-    tabela.innerHTML = "";
-
-    registros.forEach((r, i) => {
-        tabela.innerHTML += `
+    <table>
+        <thead>
             <tr>
+                <th>Número</th>
+                <th>Data</th>
+                <th>Hora</th>
+                <th>Nome</th>
+                <th>CPF</th>
+                <th>Relato do cliente</th>
+                <th>Procedimento realizado</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody id="tabela"></tbody>
+    </table>
+
+    <script>
+
+        // let registros = JSON.parse(localStorage.getItem("registros")) || [];
+
+        // function salvarLocal() {
+        //     localStorage.setItem("registros", JSON.stringify(registros));
+        // }
+
+        let proximoProtocolo = 1;
+        let registros = [];
+        let sessaoAtiva = false;
+
+        function salvarCache() {
+            if (sessaoAtiva) {
+                localStorage.setItem("registros_cache", JSON.stringify(registros));
+            }
+        }
+
+        function limparCache() {
+            localStorage.removeItem("registros_cache");
+            sessaoAtiva = false;
+        }
+
+        const cache = localStorage.getItem("registros_cache");
+        if (cache) {
+            registros = JSON.parse(cache);
+            sessaoAtiva = true;
+        }
+
+        renderizar();
+
+        function renderizar() {
+            const tabela = document.getElementById("tabela");
+            tabela.innerHTML = "";
+
+            // percorre de trás para frente (ordem decrescente)
+            for (let i = registros.length - 1; i >= 0; i--) {
+                const r = registros[i];
+
+                tabela.innerHTML += `
+            <tr>
+                <td>${r.numero}</td>
                 <td>${r.data}</td>
                 <td>${r.hora}</td>
                 <td>${r.nome}</td>
@@ -158,163 +166,172 @@ function renderizar() {
                 </td>
             </tr>
         `;
-    });
-}
-
-document.getElementById("form").addEventListener("submit", function(e) {
-    e.preventDefault();
-
-    const id = document.getElementById("id").value;
-    const registro = {
-        data: data.value,
-        hora: hora.value,
-        nome: nome.value,
-        cpf: cpf.value,
-        relato: relato.value,
-        procedimento: procedimento.value
-    };
-
-    if (id === "") {
-        registros.push(registro);
-    } else {
-        registros[id] = registro;
-    }
-
-    salvarCache();
-    renderizar();
-    limpar();
-});
-
-function editar(i) {
-    document.getElementById("id").value = i;
-    data.value = registros[i].data;
-    hora.value = registros[i].hora;
-    nome.value = registros[i].nome;
-    cpf.value = registros[i].cpf;
-    relato.value = registros[i].relato;
-    procedimento.value = registros[i].procedimento;
-}
-
-function excluir(i) {
-    if (confirm("Deseja excluir este registro?")) {
-        registros.splice(i, 1);
-        salvarCache();
-        renderizar();
-    }
-}
-
-function limpar() {
-    document.getElementById("id").value = "";
-    document.getElementById("form").reset();
-}
-
-renderizar();
-
-const labels = {
-    data: "Data",
-    hora: "Hora",
-    nome: "Nome",
-    cpf: "CPF",
-    relato: "Relato do cliente",
-    procedimento: "Procedimento realizado"
-};
-
-function exportarTXT(i) {
-    const registro = registros[i];
-    let texto = "";
-
-    for (const campo in registro) {
-        const valor = registro[campo];
-
-        if (valor && valor.toString().trim() !== "") {
-            texto += `${labels[campo] || capitalizar(campo)}: ${valor}\n`;
+            }
         }
-    }
-
-    if (texto === "") {
-        alert("Nenhum campo preenchido para exportar.");
-        return;
-    }
-
-    abrirTXT(texto);
-}
-
-function abrirTXT(conteudo) {
-    const novaJanela = window.open("", "_blank");
-    novaJanela.document.write("<pre>" + conteudo + "</pre>");
-    novaJanela.document.close();
-}
-
-function capitalizar(texto) {
-    return texto.charAt(0).toUpperCase() + texto.slice(1);
-}
-
-function exportarJSON() {
-    const timestamp = gerarTimestamp();
-    const nomeArquivo = `RegistroProtocoloSAC-${timestamp}.json`;
-
-    const blob = new Blob(
-        [JSON.stringify(registros, null, 2)],
-        { type: "application/json" }
-    );
-
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = nomeArquivo;
-    a.click();
-
-    URL.revokeObjectURL(a.href);
-
-    limparCache();
-}
 
 
-function importarJSON() {
-    document.getElementById("arquivoJSON").click();
-}
+        document.getElementById("form").addEventListener("submit", function (e) {
+            e.preventDefault();
 
-document.getElementById("arquivoJSON").addEventListener("change", function(e) {
-    const arquivo = e.target.files[0];
-    if (!arquivo) return;
+            const id = document.getElementById("id").value;
+            const registro = {
+                numero: numero.value,
+                data: data.value,
+                hora: hora.value,
+                nome: nome.value,
+                cpf: cpf.value,
+                relato: relato.value,
+                procedimento: procedimento.value
+            };
 
-    const reader = new FileReader();
-
-    reader.onload = function(evt) {
-        try {
-            const dados = JSON.parse(evt.target.result);
-
-            if (!Array.isArray(dados)) {
-                alert("Arquivo JSON inválido.");
-                return;
+            if (id === "") {
+                registro.protocolo = proximoProtocolo++;
+                registros.push(registro);
+            } else {
+                registro.protocolo = registros[id].protocolo; // mantém o número
+                registros[id] = registro;
             }
 
-            registros = dados;
-            sessaoAtiva = true;
             salvarCache();
             renderizar();
             limpar();
-        } catch {
-            alert("Erro ao ler o arquivo JSON.");
+        });
+
+        function editar(i) {
+            document.getElementById("id").value = i;
+            numero.value = registros[i].numero;
+            data.value = registros[i].data;
+            hora.value = registros[i].hora;
+            nome.value = registros[i].nome;
+            cpf.value = registros[i].cpf;
+            relato.value = registros[i].relato;
+            procedimento.value = registros[i].procedimento;
         }
-    };
 
-    reader.readAsText(arquivo);
-});
+        function excluir(i) {
+            if (confirm("Deseja excluir este registro?")) {
+                registros.splice(i, 1);
+                salvarCache();
+                renderizar();
+            }
+        }
 
-function gerarTimestamp() {
-    const agora = new Date();
+        function limpar() {
+            document.getElementById("id").value = "";
+            document.getElementById("form").reset();
+        }
 
-    const ano = agora.getFullYear();
-    const mes = String(agora.getMonth() + 1).padStart(2, "0");
-    const dia = String(agora.getDate()).padStart(2, "0");
-    const hora = String(agora.getHours()).padStart(2, "0");
-    const min = String(agora.getMinutes()).padStart(2, "0");
-    const seg = String(agora.getSeconds()).padStart(2, "0");
+        renderizar();
 
-    return `${dia}${mes}${ano}-${hora}${min}${seg}`;
-}
+        const labels = {
+            numero: "Número atendimento",
+            data: "Data",
+            hora: "Hora",
+            nome: "Nome",
+            cpf: "CPF",
+            relato: "Relato do cliente",
+            procedimento: "Procedimento realizado"
+        };
 
-</script>
+        function exportarTXT(i) {
+            const registro = registros[i];
+            let texto = "";
+
+            for (const campo in registro) {
+                const valor = registro[campo];
+
+                if (valor && valor.toString().trim() !== "") {
+                    texto += `${labels[campo] || capitalizar(campo)}: ${valor}\n`;
+                }
+            }
+
+            if (texto === "") {
+                alert("Nenhum campo preenchido para exportar.");
+                return;
+            }
+
+            abrirTXT(texto);
+        }
+
+        function abrirTXT(conteudo) {
+            const novaJanela = window.open("", "_blank");
+            novaJanela.document.write("<pre>" + conteudo + "</pre>");
+            novaJanela.document.close();
+        }
+
+        function capitalizar(texto) {
+            return texto.charAt(0).toUpperCase() + texto.slice(1);
+        }
+
+        function exportarJSON() {
+            const timestamp = gerarTimestamp();
+            const nomeArquivo = `RegistroProtocoloSAC-${timestamp}.json`;
+
+            const blob = new Blob(
+                [JSON.stringify(registros, null, 2)],
+                { type: "application/json" }
+            );
+
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = nomeArquivo;
+            a.click();
+
+            URL.revokeObjectURL(a.href);
+
+            limparCache();
+        }
+
+
+        function importarJSON() {
+            document.getElementById("arquivoJSON").click();
+        }
+
+        document.getElementById("arquivoJSON").addEventListener("change", function (e) {
+            const arquivo = e.target.files[0];
+            if (!arquivo) return;
+
+            const reader = new FileReader();
+
+            reader.onload = function (evt) {
+                try {
+                    const dados = JSON.parse(evt.target.result);
+
+                    if (!Array.isArray(dados)) {
+                        alert("Arquivo JSON inválido.");
+                        return;
+                    }
+
+                    registros = dados;
+                    proximoProtocolo =
+                        registros.reduce((max, r) => Math.max(max, r.protocolo || 0), 0) + 1;
+                    sessaoAtiva = true;
+                    salvarCache();
+                    renderizar();
+                    limpar();
+                } catch {
+                    alert("Erro ao ler o arquivo JSON.");
+                }
+            };
+
+            reader.readAsText(arquivo);
+        });
+
+        function gerarTimestamp() {
+            const agora = new Date();
+
+            const ano = agora.getFullYear();
+            const mes = String(agora.getMonth() + 1).padStart(2, "0");
+            const dia = String(agora.getDate()).padStart(2, "0");
+            const hora = String(agora.getHours()).padStart(2, "0");
+            const min = String(agora.getMinutes()).padStart(2, "0");
+            const seg = String(agora.getSeconds()).padStart(2, "0");
+
+            return `${dia}${mes}${ano}-${hora}${min}${seg}`;
+        }
+
+    </script>
 
 </body>
+
 </html>
