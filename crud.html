@@ -56,6 +56,35 @@
         .actions button {
             margin: 0 3px;
         }
+
+        .texto-longo {
+            max-width: 200px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            font-weight: normal;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 8px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+
+        textarea,
+        input {
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
     </style>
 </head>
 
@@ -83,11 +112,11 @@
         <label>CPF</label>
         <input type="text" id="cpf">
 
-        <label>Relato do cliente:</label>
-        <input type="text" id="relato">
+        <label>Relato do Cliente</label>
+        <textarea id="relato" rows="10" placeholder="Descreva o relato do cliente..."></textarea>
 
-        <label>Procedimento realizado:</label>
-        <input type="text" id="procedimento">
+        <label>Solução / Procedimento</label>
+        <textarea id="procedimento" rows="10" placeholder="Descreva a solução adotada..."></textarea>
 
         <button type="submit">Salvar</button>
         <button type="button" onclick="limpar()">Cancelar</button>
@@ -119,7 +148,7 @@
         //     localStorage.setItem("registros", JSON.stringify(registros));
         // }
 
-        let proximoProtocolo = 1;
+        let proximoNumero = 1;
         let registros = [];
         let sessaoAtiva = false;
 
@@ -152,13 +181,13 @@
 
                 tabela.innerHTML += `
             <tr>
-                <td>${r.numero}</td>
-                <td>${r.data}</td>
+                <td>${formatarNumero(r.numero)}</td>
+                <td>${formatarData(r.data)}</td>
                 <td>${r.hora}</td>
                 <td>${r.nome}</td>
                 <td>${r.cpf}</td>
-                <td>${r.relato}</td>
-                <td>${r.procedimento}</td>
+                <td class="texto-longo">${r.relato}</td>
+                <td class="texto-longo">${r.procedimento}</td>
                 <td class="actions">
                     <button onclick="editar(${i})">Editar</button>
                     <button onclick="excluir(${i})">Excluir</button>
@@ -175,7 +204,6 @@
 
             const id = document.getElementById("id").value;
             const registro = {
-                numero: numero.value,
                 data: data.value,
                 hora: hora.value,
                 nome: nome.value,
@@ -185,10 +213,10 @@
             };
 
             if (id === "") {
-                registro.protocolo = proximoProtocolo++;
+                registro.numero = proximoNumero++;
                 registros.push(registro);
             } else {
-                registro.protocolo = registros[id].protocolo; // mantém o número
+                registro.numero = registros[id].numero; // mantém o número
                 registros[id] = registro;
             }
 
@@ -199,7 +227,6 @@
 
         function editar(i) {
             document.getElementById("id").value = i;
-            numero.value = registros[i].numero;
             data.value = registros[i].data;
             hora.value = registros[i].hora;
             nome.value = registros[i].nome;
@@ -238,10 +265,17 @@
             let texto = "";
 
             for (const campo in registro) {
+
+                // ignora número (controle interno)
+                if (campo === "numero") continue;
+
                 const valor = registro[campo];
 
+                const valorFormatado =
+                    campo === "data" ? formatarData(valor) : valor;
+
                 if (valor && valor.toString().trim() !== "") {
-                    texto += `${labels[campo] || capitalizar(campo)}: ${valor}\n`;
+                    texto += `${labels[campo] || capitalizar(campo)}: ${valorFormatado}\n`;
                 }
             }
 
@@ -303,8 +337,8 @@
                     }
 
                     registros = dados;
-                    proximoProtocolo =
-                        registros.reduce((max, r) => Math.max(max, r.protocolo || 0), 0) + 1;
+                    proximoNumero =
+                        registros.reduce((max, r) => Math.max(max, r.numero || 0), 0) + 1;
                     sessaoAtiva = true;
                     salvarCache();
                     renderizar();
@@ -328,6 +362,16 @@
             const seg = String(agora.getSeconds()).padStart(2, "0");
 
             return `${dia}${mes}${ano}-${hora}${min}${seg}`;
+        }
+
+        function formatarNumero(numero, tamanho = 4) {
+            return String(numero).padStart(tamanho, "0");
+        }
+
+        function formatarData(dataISO) {
+            if (!dataISO) return "";
+            const [ano, mes, dia] = dataISO.split("-");
+            return `${dia}/${mes}/${ano}`;
         }
 
     </script>
