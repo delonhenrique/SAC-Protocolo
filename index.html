@@ -127,7 +127,7 @@
         <label>Valor</label>
         <input type="text" id="valor">
         
-        <label>Data Transação</label>
+        <label>Data da transação</label>
         <input type="text" id="data_transacao">
         
         <label>Bloqueio de valor</label>
@@ -177,8 +177,23 @@
                 <th>Hora</th>
                 <th>Nome</th>
                 <th>CPF</th>
+                <th>Telefone</th>
+                <th>Agência</th>
+                <th>Conta</th>
+                <th>Cartão</th>
+                <th>Valor</th>
+                <th>Data da transação</th>
+                <th>Bloqueio de valor</th>
+                <th>Bloqueio de Lançamento</th>
+                <th>Pacote de serviços</th>
+                <th>Motivo de encerramento</th>
+                <th>Erro no App</th>
+                <th>Empréstimos</th>
+                <th>Contrato (ativos)</th>
+                <th>Cota (consórcio)</th>
                 <th>Relato do cliente</th>
                 <th>Procedimento realizado</th>
+                <th>Parecer Final</th>
                 <th>Ações</th>
             </tr>
         </thead>
@@ -231,8 +246,27 @@
                 <td>${r.hora}</td>
                 <td>${r.nome}</td>
                 <td>${r.cpf}</td>
+                <td>${r.telefone}</td>
+                <td>${r.agencia}</td>
+                <td>${r.conta}</td>
+                <td>${r.cartao}</td>
+                <td>${r.valor}</td>
+                <td>${r.data_transacao}</td>
+                <td>${r.bloq_valor}</td>
+                <td>${r.bloq_lancamento}</td>
+                <td>${r.pacote_servicos}</td>
+                <td>${r.motivo_encerramento}</td>
+                <td>${r.erro_app}</td>
+                <td>${r.emprestimo}</td>
+                <td>${r.contrato_ativos}</td>
+                <td>${r.cota_consorcio}</td>
+                
                 <td class="texto-longo">${r.relato}</td>
+                
                 <td class="texto-longo">${r.procedimento}</td>
+                
+                <td class="texto-longo">${r.parecer_final}</td>
+                
                 <td class="actions">
                     <button onclick="editar(${i})">Editar</button>
                     <button onclick="excluir(${i})">Excluir</button>
@@ -253,8 +287,23 @@
                 hora: hora.value,
                 nome: nome.value,
                 cpf: cpf.value,
+                telefone: telefone.value,
+                agencia: agencia.value,
+                conta: conta.value,
+                cartao: cartao.value,
+                valor: valor.value,
+                data_transacao: data_transacao.value,
+                bloq_valor: bloq_valor.value,
+                bloq_lancamento: bloq_lancamento.value,
+                pacote_servicos: pacote_servicos.value,
+                motivo_encerramento: motivo_encerramento.value,
+                erro_app: erro_app.value,
+                emprestimo: emprestimo.value,
+                contrato_ativos: contrato_ativos.value,
+                cota_consorcio: cota_consorcio.value,
                 relato: relato.value,
-                procedimento: procedimento.value
+                procedimento: procedimento.value,
+                parecer_final: parecer_final.value
             };
 
             if (id === "") {
