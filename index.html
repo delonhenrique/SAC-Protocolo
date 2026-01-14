@@ -111,49 +111,49 @@
 
         <label>CPF</label>
         <input type="text" id="cpf">
-        
+
         <label>Telefone</label>
         <input type="text" id="telefone">
-        
+
         <label>E-mail</label>
-        <input type="text" id="telefone">
-        
+        <input type="text" id="email">
+
         <label>Agência</label>
         <input type="text" id="agencia">
-        
+
         <label>Conta</label>
         <input type="text" id="conta">
-        
+
         <label>Cartão</label>
         <input type="text" id="cartao">
-        
+
         <label>Valor</label>
         <input type="text" id="valor">
-        
+
         <label>Data da transação</label>
-        <input type="text" id="data_transacao">
-        
+        <input type="date" id="data_transacao">
+
         <label>Bloqueio de valor</label>
         <input type="text" id="bloq_valor">
-        
+
         <label>Bloqueio de lançamento</label>
         <input type="text" id="bloq_lancamento">
-        
+
         <label>Pacote de serviços</label>
         <input type="text" id="pacote_servicos">
-        
+
         <label>Motivo de encerramento</label>
         <input type="text" id="motivo_encerramento">
-        
+
         <label>Erro no App</label>
         <input type="text" id="erro_app">
-        
+
         <label>Empréstimo</label>
         <input type="text" id="emprestimo">
-        
+
         <label>Contrato (ativos)</label>
         <input type="text" id="contrato_ativos">
-        
+
         <label>Cota (consórcio)</label>
         <input type="text" id="cota_consorcio">
 
@@ -162,7 +162,7 @@
 
         <label>Procedimentos realizados</label>
         <textarea id="procedimento" rows="10" placeholder="Descreva a solução adotada..."></textarea>
-        
+
         <label>Parecer Final</label>
         <textarea id="parecer_final" rows="10" placeholder="Descreva o resultado final do atendimento..."></textarea>
 
@@ -393,26 +393,61 @@
         };
 
         function exportarTXT(i) {
-            const registro = registros[i];
+            const r = registros[i];
             let texto = "";
 
-            for (const campo in registro) {
+            function addLinha(label, valor, isData = false) {
+                if (!valor || valor === "undefined") return;
 
-                // ignora número (controle interno)
-                if (campo === "numero") continue;
+                const v = isData ? formatarData(valor) : valor;
 
-                const valor = registro[campo];
-
-                const valorFormatado =
-                    campo === "data" ? formatarData(valor) : valor;
-
-                if (valor && valor.toString().trim() !== "") {
-                    texto += `${labels[campo] || capitalizar(campo)}: ${valorFormatado}\n`;
+                if (v !== "") {
+                    texto += `${label}: ${v}\n`;
                 }
             }
 
+            // ===== CAMPOS SIMPLES =====
+            addLinha("Data", r.data, true);
+            addLinha("Hora", r.hora);
+            addLinha("Nome", r.nome);
+            addLinha("CPF", r.cpf);
+            addLinha("Telefone", r.telefone);
+            addLinha("E-mail", r.email);
+            addLinha("Agência", r.agencia);
+            addLinha("Conta", r.conta);
+            addLinha("Cartão", r.cartao);
+            addLinha("Valor", r.valor);
+            addLinha("Data da transação", r.data_transacao, true);
+            addLinha("Bloqueio de valor", r.bloq_valor);
+            addLinha("Bloqueio de lançamento", r.bloq_lancamento);
+            addLinha("Pacote de serviços", r.pacote_servicos);
+            addLinha("Motivo do encerramento", r.motivo_encerramento);
+            addLinha("Erro no App", r.erro_app);
+            addLinha("Empréstimos", r.emprestimo);
+            addLinha("Contrato (ativos)", r.contrato_ativos);
+            addLinha("Cota (consórcio)", r.cota_consorcio);
+
+            // ===== CAMPOS DE TEXTO LONGO =====
+            if (r.relato) {
+                texto += `\n_________________________\n`;
+                texto += `Relato do cliente:\n`;
+                texto += `${r.relato}\n`;
+            }
+
+            if (r.procedimento) {
+                texto += `\n_________________________\n`;
+                texto += `Procedimentos:\n`;
+                texto += `${r.procedimento}\n`;
+            }
+
+            if (r.parecer_final) {
+                texto += `\n_________________________\n`;
+                texto += `Parecer final:\n`;
+                texto += `${r.parecer_final}\n`;
+            }
+
             if (texto === "") {
-                alert("Nenhum campo preenchido para exportar.");
+                alert("Nenhum dado preenchido para gerar o protocolo.");
                 return;
             }
 
