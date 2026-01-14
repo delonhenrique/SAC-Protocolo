@@ -115,6 +115,9 @@
         <label>Telefone</label>
         <input type="text" id="telefone">
         
+        <label>E-mail</label>
+        <input type="text" id="telefone">
+        
         <label>Agência</label>
         <input type="text" id="agencia">
         
@@ -178,6 +181,7 @@
                 <th>Nome</th>
                 <th>CPF</th>
                 <th>Telefone</th>
+                <th>E-mail</th>
                 <th>Agência</th>
                 <th>Conta</th>
                 <th>Cartão</th>
@@ -247,6 +251,7 @@
                 <td>${r.nome}</td>
                 <td>${r.cpf}</td>
                 <td>${r.telefone}</td>
+                <td>${r.email}</td>
                 <td>${r.agencia}</td>
                 <td>${r.conta}</td>
                 <td>${r.cartao}</td>
@@ -288,6 +293,7 @@
                 nome: nome.value,
                 cpf: cpf.value,
                 telefone: telefone.value,
+                email: email.value,
                 agencia: agencia.value,
                 conta: conta.value,
                 cartao: cartao.value,
@@ -325,8 +331,24 @@
             hora.value = registros[i].hora;
             nome.value = registros[i].nome;
             cpf.value = registros[i].cpf;
+            telefone.value = registros[i].telefone;
+            email.value = registros[i].email;
+            agencia.value = registros[i].agencia;
+            conta.value = registros[i].conta;
+            cartao.value = registros[i].cartao;
+            valor.value = registros[i].valor;
+            data_transacao.value = registros[i].data_transacao;
+            bloq_valor.value = registros[i].bloq_valor;
+            bloq_lancamento.value = registros[i].bloq_lancamento;
+            pacote_servicos.value = registros[i].pacote_servicos;
+            motivo_encerramento.value = registros[i].motivo_encerramento;
+            erro_app.value = registros[i].erro_app;
+            emprestimo.value = registros[i].emprestimo;
+            contrato_ativos.value = registros[i].contrato_ativos;
+            cota_consorcio.value = registros[i].cota_consorcio;
             relato.value = registros[i].relato;
             procedimento.value = registros[i].procedimento;
+            parecer_final.value = registros[i].parecer_final;
         }
 
         function excluir(i) {
@@ -350,8 +372,24 @@
             hora: "Hora",
             nome: "Nome",
             cpf: "CPF",
+            telefone: "Telefone",
+            email: "E-mail",
+            agencia: "Agência",
+            conta: "Conta",
+            cartao: "Cartão",
+            valor: "Valor",
+            data_transacao: "Data da transação",
+            bloq_valor: "Bloqueio de valor",
+            bloq_lancamento: "Bloqueio de lançamento",
+            pacote_servicos: "Pacote de serviços",
+            motivo_encerramento: "Motivo do encerramento",
+            erro_app: "Erro no App",
+            emprestimo: "Empréstimos",
+            contrato_ativos: "Contrato (ativos)",
+            cota_consorcio: "Cota (consórcio)",
             relato: "Relato do cliente",
-            procedimento: "Procedimento realizado"
+            procedimento: "Procedimento realizado",
+            parecer_final: "Parecer final"
         };
 
         function exportarTXT(i) {
